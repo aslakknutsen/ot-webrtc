@@ -122,8 +122,6 @@ func SessionHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-	} else {
-		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
