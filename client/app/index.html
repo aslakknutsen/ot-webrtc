@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 	<meta charset="UTF-8">
@@ -30,9 +31,22 @@
 	<!-- endbuild -->
 
 </head>
+
 <body>
 
-    <textarea id="editor" cols="120" rows="30"></textarea>
+	<div>
+		<textarea id="editor" cols="120" rows="30"></textarea>
+	</div>
+
+	<br/><br/>
+
+	<div>
+		<button id="share">Start share</button>
+
+		<pre id="sessions" />
+
+	</div>
+
 
 	<!-- removeIf(build) -->
 	<!-- build:js scripts/assets.js -->
@@ -51,8 +65,42 @@
 	<!-- build:js scripts/scripts.js -->
 	<!-- inject:js -->
 	<script src="scripts/init.js"></script>
+	<script src="scripts/sessions.js"></script>
 	<!-- endinject -->
 	<!-- endbuild -->
 
+
 </body>
+
 </html>
+
+<script>
+
+	var user = "Aslak"
+
+	var session = Session("http://localhost:8080", "A")
+
+	$("#share").click(function () {
+		session.start()
+	})
+
+	setInterval(function () {
+		session.sessions().success(function (resp) {
+			$("#sessions").html("")
+
+			for (var i = 0; i < resp.length; i++) {
+				var s = $("<div>")
+				s.append($("<button>join</button>").click(
+					function (index) {
+						return function () {
+							session.join(index)
+						}
+					} (i)))
+				s.append($("<div>" + JSON.stringify(resp[i], null, 4) + "</div>"))
+				$("#sessions").append(s).append($("<br/>"))
+			}
+		})
+	}, 2000)
+
+
+</script>
