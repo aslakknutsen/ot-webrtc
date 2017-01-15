@@ -1,6 +1,6 @@
 'use strict';
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     var cm = CodeMirror.fromTextArea(document.getElementById('editor'), {
         lineNumbers: true
@@ -15,11 +15,16 @@ $(document).ready(function() {
         console.log('My peer ID is: ' + id);
 
     });
+    var peers = new Array()
     peer.on('connection', function (conn) {
+        peers.push(conn)
         cmAdapter.registerCallbacks({
             change: function (operation, _) {
                 console.log(operation);
-                conn.send(operation);
+                for (var i = 0; i < peers.length; i++) {
+                    console.log("P Send to " + peers[i].peer)
+                    peers[i].send(operation);
+                }
             }
         });
         conn.on('data', function (data) {
@@ -53,20 +58,35 @@ $(document).ready(function() {
                                 }
                             };
                             session.join(index);
-                            var conn = peer.connect(resp[index].owner.name, {serialization: 'json'});
-                            conn.on('open', function () {
-                                cmAdapter.registerCallbacks({
-                                    change: function (operation, _) {
-                                        conn.send(operation);
-                                    }
+                            var c = function (name) {
+                                var conn = peer.connect(name, { serialization: 'json' });
+                                conn.on('open', function () {
+                                    peers.push(conn)
+                                    cmAdapter.registerCallbacks({
+                                        change: function (operation, _) {
+                                            for (var n = 0; n < peers.length; n++) {
+                                                console.log("S Send to " + peers[n].peer)
+                                                peers[n].send(operation);
+                                            }
+
+                                        }
+                                    });
+                                    conn.on('data', function (data) {
+                                        console.log('Received', data);
+                                        cmAdapter.applyOperation(ot.TextOperation.fromJSON(data));
+                                    });
                                 });
-                                conn.on('data', function (data) {
-                                    console.log('Received', data);
-                                    cmAdapter.applyOperation(ot.TextOperation.fromJSON(data));
-                                });
-                            });
+                            }
+                            c(resp[index].owner.name)
+                            for (var n = 0; resp[index].participants != null && n < resp[index].participants.length; n++) {
+                                var part = resp[index].participants[n]
+                                if (part.name != user) {
+                                    c(part.name)
+                                }
+                            }
+
                         }
-                    }(i)));
+                    } (i)));
                 s.append($("<div>" + JSON.stringify(resp[i], null, 4) + "</div>"));
                 $("#sessions").append(s).append($("<br/>"));
             }
