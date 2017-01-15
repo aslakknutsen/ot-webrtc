@@ -12,7 +12,7 @@ import (
 
 type User struct {
 	Name   string `json:"name"`
-	PeerID string `json:"peer_id"`
+	PeerID string `json:"peerid"`
 }
 
 type Session struct {
@@ -65,7 +65,7 @@ func SessionsIndexHandler(w http.ResponseWriter, r *http.Request) {
 		index := len(sessions)
 		sessions = append(sessions, &session)
 		contexts[context] = sessions
-		w.Header().Set("Location", fmt.Sprintf("http://localhost:8080/%s/sessions/%d", context, index))
+		w.Header().Set("Location", AbsoluteURL(r, fmt.Sprintf("/%s/sessions/%d", context, index)))
 		w.WriteHeader(http.StatusCreated)
 		if err := json.NewEncoder(w).Encode(session); err != nil {
 			fmt.Println(err)
@@ -103,7 +103,6 @@ func SessionHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if r.Method == "PATCH" {
 			var nsession Session
-			fmt.Println(nsession)
 			if err := json.NewDecoder(r.Body).Decode(&nsession); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -124,4 +123,13 @@ func SessionHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}
+}
+
+// AbsoluteURL prefixes a relative URL with absolute address
+func AbsoluteURL(req *http.Request, relative string) string {
+	scheme := "http"
+	if req.TLS != nil { // isHTTPS
+		scheme = "https"
+	}
+	return fmt.Sprintf("%s://%s%s", scheme, req.Host, relative)
 }
