@@ -24,7 +24,7 @@ $(document).ready(function() {
         });
         conn.on('data', function (data) {
             console.log('Received', data);
-            cmAdapter.applyOperation(data);
+            cmAdapter.applyOperation(ot.TextOperation.fromJSON(data));
         });
     });
 
@@ -62,7 +62,7 @@ $(document).ready(function() {
                                 });
                                 conn.on('data', function (data) {
                                     console.log('Received', data);
-                                    cmAdapter.applyOperation(data);
+                                    cmAdapter.applyOperation(ot.TextOperation.fromJSON(data));
                                 });
                             });
                         }
