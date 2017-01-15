@@ -38,6 +38,7 @@ func SessionsIndexHandler(w http.ResponseWriter, r *http.Request) {
 	context := vars["context"]
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	Origin(w)
 
 	var sessions []*Session
 	var ok bool
@@ -82,6 +83,7 @@ func SessionHandler(w http.ResponseWriter, r *http.Request) {
 	sessionid := vars["sessionid"]
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	Origin(w)
 
 	if sessions, ok := contexts[context]; ok {
 		sessionIndx, err := strconv.Atoi(sessionid)
@@ -132,4 +134,10 @@ func AbsoluteURL(req *http.Request, relative string) string {
 		scheme = "https"
 	}
 	return fmt.Sprintf("%s://%s%s", scheme, req.Host, relative)
+}
+
+func Origin(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "X-Request-Id, Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE")
 }
