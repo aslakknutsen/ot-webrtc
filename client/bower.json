@@ -7,6 +7,7 @@
     "modernizr": "~2.8.3",
     "normalize-css": "~4.1.1",
     "codemirror": "^5.22.2",
-    "ot": "^0.0.15"
+    "ot": "^0.0.15",
+    "webrtc-adapter": "2.1.0"
   }
 }
