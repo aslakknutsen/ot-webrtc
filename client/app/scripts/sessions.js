@@ -3,11 +3,13 @@
 new function (exp) {
 
     exp.Session = function (server, context) {
+        const sessionUrl = server + '/' + context + '/sessions';
         return {
             start: function () {
+
                 return $.ajax({
                     method: 'POST',
-                    url: server + '/' + context + '/sessions',
+                    url: sessionUrl,
                     data: JSON.stringify({
                         'owner': this.whoami()
                     }),
@@ -18,7 +20,7 @@ new function (exp) {
             join: function (session) {
                 return $.ajax({
                     method: 'PATCH',
-                    url: server + '/' + context + '/sessions/' + session,
+                    url: sessionUrl + '/' + session,
                     data: JSON.stringify({
                         'participants': [
                             this.whoami()
@@ -31,7 +33,7 @@ new function (exp) {
             sessions: function () {
                 return $.ajax({
                     method: 'GET',
-                    url: server + '/' + context + '/sessions',
+                    url: sessionUrl,
                     dataType: 'json'
                 });
             },
