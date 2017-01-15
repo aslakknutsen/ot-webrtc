@@ -13,7 +13,7 @@ new function (exp) {
                     }),
                     dataType: 'json',
                     contentType: 'application/json'
-                })
+                });
             },
             join: function (session) {
                 return $.ajax({
@@ -26,20 +26,20 @@ new function (exp) {
                     }),
                     dataType: 'json',
                     contentType: 'application/json'
-                })
+                });
             },
             sessions: function () {
                 return $.ajax({
                     method: 'GET',
                     url: server + '/' + context + '/sessions',
                     dataType: 'json'
-                })
+                });
             },
             whoami: function () {
                 return {
                     'name': 'Test 2',
                     'peerid': 'AA'
-                }
+                };
             }
         }
     }
