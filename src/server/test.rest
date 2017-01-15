@@ -1,0 +1,30 @@
+GET http://localhost:8080/A/sessions HTTP/1.1
+
+###
+
+POST http://localhost:8080/A/sessions HTTP/1.1
+content-type: application/json
+
+{
+	"owner": {
+		"name": "Aslak",
+		"peer_id": "x"
+	}
+}
+
+### 
+
+GET http://localhost:8080/A/sessions/0 HTTP/1.1
+
+###
+
+PATCH http://localhost:8080/A/sessions/0 HTTP/1.1
+
+{
+	"participants": [
+		{
+			"name": "Aslak 2",
+			"peer_id": "x"
+		}
+	]
+}
