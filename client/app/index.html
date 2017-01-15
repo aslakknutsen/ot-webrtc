@@ -57,6 +57,7 @@
 	<script src="bower_components/codemirror/lib/codemirror.js"></script>
 	<script src="bower_components/ot/dist/ot.js"></script>
 	<script src="bower_components/webrtc-adapter/release/adapter.js"></script>
+	<script src="bower_components/peerjs/peer.js"></script>
 	<!-- endbower -->
 
 	<!-- endbuild -->
@@ -76,104 +77,73 @@
 
 <script>
 
-	var user = "Aslak"
+	var user = getParameterByName("user")
 
-	var pc = new RTCPeerConnection({ "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] });
-	pc.ondatachannel = function (ev) {
-		console.log('Data channel is created!');
-		ev.channel.onopen = function () {
-			console.log('Data channel is open and ready to be used.');
-		};
-	};
-	pc.onicecandidate = function (e) {
-		console.log("onicecandidate: " + e)
-	}
-	pc.oniceconnectionstatechange = function (e) {
-		console.log("oniceconnectionstatechange: " + e)
-	}
-	pc.onnegotiationneeded = function (e) {
-		console.log("onnegotiationneeded: " + e)
-	}
-	pc.onsignalingstatechange = function (e) {
-		console.log("onsignalingstatechange: " + e)
-	}
+	var peer = new Peer(user, { host: '192.168.0.174', port: 9000, secure: false, debug: 3 });
+	peer.on('open', function (id) {
+		console.log('My peer ID is: ' + id);
 
-	function error(err) {
-		console.log(err)
-		pc.close()
-	}
-	var sessionOwner = false
+	});
+	peer.on('connection', function (conn) {
 
-	var session = Session("http://192.168.0.174:8080", "A")
-	$("#share").click(function () {
-		pc.createOffer(function (offer) {
-			pc.setLocalDescription(offer, function () {
-				session.whoami = function () {
-					return {
-						"name": user,
-						"peerid": offer
-					}
-				}
-				sessionOwner = true
-				session.start()
-				console.log("Owner: Created session")
-			}, error);
-		}, error);
+		conn.on('data', function (data) {
+			console.log('Received', data);
+			conn.send("weee")
+		});
+	});
+
+
+	var session = Session('http://192.168.0.174:8080', 'A')
+	$('#share').click(function () {
+		session.whoami = function () {
+			return {
+				'name': user,
+			}
+		}
+		session.start()
 	})
 
 	setInterval(function () {
 		session.sessions().success(function (resp) {
-			$("#sessions").html("")
+			$('#sessions').html('')
 			for (var i = 0; i < resp.length; i++) {
-				if (sessionOwner) {
-					if (resp[i].participants != null && resp[i].participants.length > 0) {
-						console.log("Owner: Answer session: " + resp[i].participants[0].peerid.type)
-						pc.setRemoteDescription(new RTCSessionDescription(resp[i].participants[0].peerid), function () { }, error);
-						console.log("Owner: Create data channel")
-						var channel = pc.createDataChannel(null, {})
-						channel.onmessage = function (msg) {
-							console.log(msg)
-							channel.send(msg + 1)
-						}
-						channel.onopen = function () {
-							console.log('Data channel is open and ready to be used.');
-						}
-						channel.onclose = function () {
-							console.log('Data channel is closed.');
-						}
-						channel.onerror = function (err) {
-							console.log('Data channel is in error ' + err);
-						}
-
-						sessionOwner = false
-
-					}
-				}
-				var s = $("<div>")
-				s.append($("<button>join</button>").click(
+				var s = $('<div>')
+				s.append($('<button>join</button>').click(
 					function (index) {
 						return function () {
-							pc.setRemoteDescription(new RTCSessionDescription(resp[index].owner.peerid), function () {
-								pc.createAnswer(function (answer) {
-									pc.setLocalDescription(answer, function () {
-										session.whoami = function () {
-											return {
-												"name": user,
-												"peerid": answer
-											}
-										}
-										session.join(index)
-										console.log("Participant: Join session")
-									}, error);
-								}, error);
-							}, error);
+							session.whoami = function () {
+								return {
+									name: user,
+								}
+							}
+							session.join(index)
+							var conn = peer.connect(resp[index].owner.name);
+							conn.on('open', function () {
+								// Receive messages
+								conn.on('data', function (data) {
+									console.log('Received', data);
+								});
+
+								// Send messages
+								conn.send('Hello!');
+							});
 						}
-					} (i)))
+					} (i)));
 				s.append($("<div>" + JSON.stringify(resp[i], null, 4) + "</div>"))
 				$("#sessions").append(s).append($("<br/>"))
 			}
 		})
 	}, 2000)
 
-
+	function getParameterByName(name, url) {
+		if (!url) {
+			url = window.location.href;
+		}
+		name = name.replace(/[\[\]]/g, "\\$&");
+		var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}
 </script>
