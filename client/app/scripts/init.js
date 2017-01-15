@@ -8,8 +8,7 @@ $(document).ready(function() {
 
     var cmAdapter = new ot.CodeMirrorAdapter(cm);
 
-
-    var user = getParameterByName("user")
+    var user = getParameterByName("user");
 
     var peer = new Peer(user, { host: '192.168.0.174', port: 9000, secure: false, debug: 3 });
     peer.on('open', function (id) {
@@ -19,32 +18,32 @@ $(document).ready(function() {
     peer.on('connection', function (conn) {
         cmAdapter.registerCallbacks({
             change: function (operation, _) {
+                console.log(operation);
                 conn.send(operation);
             }
         });
         conn.on('data', function (data) {
             console.log('Received', data);
             cmAdapter.applyOperation(data);
-            // Update cm
         });
     });
 
 
-    var session = Session('http://192.168.0.174:8080', 'A')
+    var session = Session('http://192.168.0.174:8080', 'A');
     $('#share').click(function () {
         session.whoami = function () {
             return {
-                'name': user,
-            }
-        }
-        session.start()
-    })
+                'name': user
+            };
+        };
+        session.start();
+    });
 
     setInterval(function () {
         session.sessions().success(function (resp) {
-            $('#sessions').html('')
+            $('#sessions').html('');
             for (var i = 0; i < resp.length; i++) {
-                var s = $('<div>')
+                var s = $('<div>');
                 s.append($('<button>join</button>').click(
                     function (index) {
                         return function () {
@@ -53,8 +52,8 @@ $(document).ready(function() {
                                     name: user
                                 }
                             };
-                            session.join(index)
-                            var conn = peer.connect(resp[index].owner.name);
+                            session.join(index);
+                            var conn = peer.connect(resp[index].owner.name, {serialization: 'json'});
                             conn.on('open', function () {
                                 cmAdapter.registerCallbacks({
                                     change: function (operation, _) {
@@ -68,14 +67,11 @@ $(document).ready(function() {
                             });
                         }
                     }(i)));
-                s.append($("<div>" + JSON.stringify(resp[i], null, 4) + "</div>"))
-                $("#sessions").append(s).append($("<br/>"))
+                s.append($("<div>" + JSON.stringify(resp[i], null, 4) + "</div>"));
+                $("#sessions").append(s).append($("<br/>"));
             }
         })
     }, 2000);
-
-
-
 
     function getParameterByName(name, url) {
         if (!url) {
@@ -88,7 +84,5 @@ $(document).ready(function() {
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
-
-    // TODO listen to messages
 
 });
