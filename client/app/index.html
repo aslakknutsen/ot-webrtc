@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Yeomify generator</title>
+
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+	<!-- removeIf(build) -->
+	<!-- build:js css/assets.css -->
+
+	<!-- bower:css -->
+	<link rel="stylesheet" href="bower_components/normalize-css/normalize.css" />
+	<link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css" />
+	<!-- endbower -->
+
+	<!-- endbuild -->
+	<!-- endRemoveIf(build) -->
+
+	<!-- build:js css/style.css -->
+	<!-- inject:css -->
+	<link rel="stylesheet" href=".tmp/style.css">
+	<!-- endinject -->
+	<!-- endbuild -->
+
+</head>
+<body>
+
+    <textarea id="editor" cols="120" rows="30"></textarea>
+
+	<!-- removeIf(build) -->
+	<!-- build:js scripts/assets.js -->
+
+	<!-- bower:js -->
+	<script src="bower_components/modernizr/modernizr.js"></script>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/codemirror/lib/codemirror.js"></script>
+	<script src="bower_components/ot/dist/ot.js"></script>
+	<!-- endbower -->
+
+	<!-- endbuild -->
+	<!-- endRemoveIf(build) -->
+
+	<!-- build:js scripts/scripts.js -->
+	<!-- inject:js -->
+	<script src="scripts/init.js"></script>
+	<!-- endinject -->
+	<!-- endbuild -->
+
+</body>
+</html>

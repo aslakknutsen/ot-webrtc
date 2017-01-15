@@ -1,0 +1,12 @@
+{
+  "name": "ot-webrtc-client",
+  "version": "0.0.0",
+  "description": "JS Client for OT-WebRTC",
+  "dependencies": {
+    "jquery": "~2.2.3",
+    "modernizr": "~2.8.3",
+    "normalize-css": "~4.1.1",
+    "codemirror": "^5.22.2",
+    "ot": "^0.0.15"
+  }
+}
