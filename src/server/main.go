@@ -10,9 +10,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Peer struct {
+	Type string `json:"type"`
+	SDP  string `json:"sdp"`
+}
+
 type User struct {
 	Name   string `json:"name"`
-	PeerID string `json:"peerid"`
+	PeerID Peer   `json:"peerid"`
 }
 
 type Session struct {
